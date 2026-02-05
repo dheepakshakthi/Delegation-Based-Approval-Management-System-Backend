@@ -44,7 +44,7 @@ A comprehensive Node.js/Express REST API for managing approval workflows with de
    PORT=5000
    
    # MongoDB (already configured)
-   MONGODB_URI=mongodb+srv://adminDatabase:Rb3395@dbams.kpdevvj.mongodb.net/DBAMS?retryWrites=true&w=majority
+   MONGODB_URI="your_mongodb_uri"
    
    # JWT Configuration
    JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
