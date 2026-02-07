@@ -32,19 +32,19 @@ const updateDelegationValidation = [
   body('reason').optional().trim().notEmpty().withMessage('Reason cannot be empty')
 ];
 
-// Special routes
-router.get('/active', getActiveDelegations);
-router.get('/my-delegations', getMyDelegations);
-router.get('/to-me', getDelegationsToMe);
+// Special routes - Only Approvers and Admins can access delegations
+router.get('/active', authorize('Approver', 'Admin'), getActiveDelegations);
+router.get('/my-delegations', authorize('Approver', 'Admin'), getMyDelegations);
+router.get('/to-me', authorize('Approver', 'Admin'), getDelegationsToMe);
 
-// CRUD routes
+// CRUD routes - Only Approvers and Admins
 router.route('/')
-  .get(getDelegations)
+  .get(authorize('Approver', 'Admin'), getDelegations)
   .post(authorize('Approver', 'Admin'), createDelegationValidation, validate, createDelegation);
 
 router.route('/:id')
-  .get(getDelegation)
-  .put(updateDelegationValidation, validate, updateDelegation)
-  .delete(deleteDelegation);
+  .get(authorize('Approver', 'Admin'), getDelegation)
+  .put(authorize('Approver', 'Admin'), updateDelegationValidation, validate, updateDelegation)
+  .delete(authorize('Approver', 'Admin'), deleteDelegation);
 
 module.exports = router;

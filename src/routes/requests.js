@@ -48,20 +48,20 @@ const commentValidation = [
 ];
 
 // Special routes
-router.get('/pending', getPendingRequests);
+router.get('/pending', authorize('Approver', 'Admin'), getPendingRequests);
 router.get('/my-requests', getMyRequests);
 
 // Request routes
 router.route('/')
   .get(getRequests)
-  .post(createRequestValidation, validate, createRequest);
+  .post(authorize('Requester', 'Approver', 'Admin'), createRequestValidation, validate, createRequest);
 
 router.route('/:id')
   .get(getRequest)
-  .put(updateRequestValidation, validate, updateRequest)
-  .delete(deleteRequest);
+  .put(authorize('Requester', 'Admin'), updateRequestValidation, validate, updateRequest)
+  .delete(authorize('Requester', 'Admin'), deleteRequest);
 
-// Approval actions
+// Approval actions - Only Approvers and Admins can approve/reject
 router.put('/:id/approve', authorize('Approver', 'Admin'), approveRequest);
 router.put('/:id/reject', authorize('Approver', 'Admin'), rejectValidation, validate, rejectRequest);
 

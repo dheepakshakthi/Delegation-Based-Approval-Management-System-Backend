@@ -77,14 +77,14 @@ exports.getDelegation = async (req, res, next) => {
 
 // @desc    Create new delegation
 // @route   POST /api/delegations
-// @access  Private/Approver
+// @access  Private (Approver, Admin only)
 exports.createDelegation = async (req, res, next) => {
   try {
-    // Only approvers can create delegations
-    if (req.user.role !== 'Approver' && req.user.role !== 'Admin') {
+    // Strict check: Only approvers and admins can create delegations
+    if (!['Approver', 'Admin'].includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        message: 'Only approvers can create delegations'
+        message: 'Access denied. Only Approvers and Admins can create delegations'
       });
     }
 

@@ -48,7 +48,7 @@ exports.getUsers = async (req, res, next) => {
 
 // @desc    Get single user
 // @route   GET /api/users/:id
-// @access  Private
+// @access  Private (Own profile or Admin)
 exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
@@ -57,6 +57,14 @@ exports.getUser = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: 'User not found'
+      });
+    }
+
+    // Users can only view their own profile, unless they're admin
+    if (req.user._id.toString() !== req.params.id && req.user.role !== 'Admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to view this user profile'
       });
     }
 

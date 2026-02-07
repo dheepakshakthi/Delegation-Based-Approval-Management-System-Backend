@@ -93,15 +93,14 @@ delegationSchema.methods.hasOverlap = async function(delegatorId) {
 };
 
 // Middleware to populate references
-delegationSchema.pre(/^find/, function(next) {
+delegationSchema.pre(/^find/, function() {
   this.populate({
     path: 'delegator',
-    select: 'name email department position'
+    select: 'name email department position role'
   }).populate({
     path: 'delegate',
-    select: 'name email department position'
+    select: 'name email department position role'
   });
-  next();
 });
 
 // Static method to get active delegation for a user

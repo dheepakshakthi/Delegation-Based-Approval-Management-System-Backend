@@ -81,18 +81,17 @@ approvalRequestSchema.virtual('comments', {
 });
 
 // Middleware to populate references
-approvalRequestSchema.pre(/^find/, function(next) {
+approvalRequestSchema.pre(/^find/, function() {
   this.populate({
     path: 'requester',
-    select: 'name email department position'
+    select: 'name email department position role'
   }).populate({
     path: 'approver',
-    select: 'name email department position'
+    select: 'name email department position role'
   }).populate({
     path: 'actualApprover',
-    select: 'name email department position'
+    select: 'name email department position role'
   });
-  next();
 });
 
 module.exports = mongoose.model('ApprovalRequest', approvalRequestSchema);

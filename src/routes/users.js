@@ -13,15 +13,15 @@ const router = express.Router();
 // All routes require authentication
 router.use(protect);
 
-// Get users by role (for dropdowns)
-router.get('/role/:role', getUsersByRole);
+// Get users by role (for dropdowns) - needed for creating requests/delegations
+router.get('/role/:role', authorize('Requester', 'Approver', 'Admin'), getUsersByRole);
 
 // Admin only routes
 router.get('/', authorize('Admin'), getUsers);
 router.put('/:id', authorize('Admin'), updateUser);
 router.delete('/:id', authorize('Admin'), deleteUser);
 
-// Get single user (accessible to all authenticated users)
+// Get single user - users can view their own profile, admins can view any
 router.get('/:id', getUser);
 
 module.exports = router;

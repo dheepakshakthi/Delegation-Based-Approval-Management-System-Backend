@@ -57,6 +57,7 @@ exports.getRequests = async (req, res, next) => {
       data: requests
     });
   } catch (error) {
+    console.error('Error in getRequests:', error);
     res.status(500).json({
       success: false,
       message: error.message
@@ -96,6 +97,7 @@ exports.getRequest = async (req, res, next) => {
       data: request
     });
   } catch (error) {
+    console.error('Error in getRequest:', error);
     res.status(500).json({
       success: false,
       message: error.message
@@ -105,9 +107,17 @@ exports.getRequest = async (req, res, next) => {
 
 // @desc    Create new approval request
 // @route   POST /api/requests
-// @access  Private
+// @access  Private (Requester, Approver, Admin)
 exports.createRequest = async (req, res, next) => {
   try {
+    // Check if user can create requests
+    if (!['Requester', 'Approver', 'Admin'].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only Requesters, Approvers, and Admins can create requests'
+      });
+    }
+
     // Add requester to req.body
     req.body.requester = req.user._id;
 
@@ -140,7 +150,7 @@ exports.createRequest = async (req, res, next) => {
 
 // @desc    Update approval request
 // @route   PUT /api/requests/:id
-// @access  Private
+// @access  Private (Requester - own requests, Admin - all)
 exports.updateRequest = async (req, res, next) => {
   try {
     let request = await ApprovalRequest.findById(req.params.id);
@@ -152,11 +162,15 @@ exports.updateRequest = async (req, res, next) => {
       });
     }
 
-    // Check if user is the requester
-    if (request.requester._id.toString() !== req.user._id.toString() && req.user.role !== 'Admin') {
+    // Only Requesters can update their own requests, or Admin can update any
+    const isOwnRequest = request.requester._id.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'Admin';
+    const isRequester = req.user.role === 'Requester';
+
+    if (!isAdmin && (!isRequester || !isOwnRequest)) {
       return res.status(403).json({
         success: false,
-        message: 'Not authorized to update this request'
+        message: 'Only the requester or admin can update this request'
       });
     }
 
@@ -411,6 +425,7 @@ exports.getPendingRequests = async (req, res, next) => {
     // Admin sees all pending
 
     const requests = await ApprovalRequest.find(query)
+      .populate('comments')
       .sort('-priority -createdAt');
 
     res.status(200).json({
@@ -419,6 +434,7 @@ exports.getPendingRequests = async (req, res, next) => {
       data: requests
     });
   } catch (error) {
+    console.error('Error in getPendingRequests:', error);
     res.status(500).json({
       success: false,
       message: error.message
@@ -432,6 +448,7 @@ exports.getPendingRequests = async (req, res, next) => {
 exports.getMyRequests = async (req, res, next) => {
   try {
     const requests = await ApprovalRequest.find({ requester: req.user._id })
+      .populate('comments')
       .sort('-createdAt');
 
     res.status(200).json({
@@ -440,6 +457,7 @@ exports.getMyRequests = async (req, res, next) => {
       data: requests
     });
   } catch (error) {
+    console.error('Error in getMyRequests:', error);
     res.status(500).json({
       success: false,
       message: error.message

@@ -22,12 +22,11 @@ const commentSchema = new mongoose.Schema({
 });
 
 // Middleware to populate user information
-commentSchema.pre(/^find/, function(next) {
+commentSchema.pre(/^find/, function() {
   this.populate({
     path: 'user',
-    select: 'name email position'
+    select: 'name email position role'
   });
-  next();
 });
 
 module.exports = mongoose.model('Comment', commentSchema);
