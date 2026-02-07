@@ -10,7 +10,7 @@ NODE_ENV=production
 PORT=5000
 
 # MongoDB - Use your production connection string
-MONGODB_URI=mongodb+srv://adminDatabase:Rb3395@dbams.kpdevvj.mongodb.net/DBAMS?retryWrites=true&w=majority
+MONGODB_URI="your_mongodb_uri"
 
 # JWT - CHANGE THESE IN PRODUCTION!
 JWT_SECRET=<generate-a-long-random-secret-key-here>
